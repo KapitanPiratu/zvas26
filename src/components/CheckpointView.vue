@@ -135,6 +135,7 @@ const readChildValues = () => {
      * Reads values (id and completed status) from Task components.
      */
 
+    tasksResult.value = [];
     tasks.value.map((t) => {
         tasksResult.value.push({
             id: t.id,
