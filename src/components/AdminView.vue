@@ -52,8 +52,21 @@ onMounted(() => {
                 <td>{{ team.id }}</td>
                 <td>{{ team.name }}</td>
                 <td>{{ team.points }}</td>
-                <td>{{ "-" }}</td>
-                <td>{{ "-" }}</td>
+                <td>{{ team.logs[0] ? team.logs[0].name : "-" }}</td>
+                <td>
+                    <span
+                        class="status"
+                        :class="team.logs[0] ? team.logs[0].status : ''"
+                    >
+                        {{
+                            team.logs[0]
+                                ? team.logs[0].status +
+                                  " " +
+                                  team.logs[0].created_at
+                                : "-"
+                        }}
+                    </span>
+                </td>
             </tr>
         </tbody>
     </v-table>
@@ -109,5 +122,20 @@ th {
     top: 5%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.status {
+    padding: 0.6rem;
+    border-radius: 50px;
+}
+
+.departed {
+    background-color: #06a77d;
+    color: #03402f;
+}
+
+.arrived {
+    background-color: #367ac4;
+    color: #122c49;
 }
 </style>
