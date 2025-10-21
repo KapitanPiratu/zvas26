@@ -11,6 +11,7 @@ const snackbarMsg = ref("");
 //display checkpoint id (from url params)
 const searchParams = new URLSearchParams(window.location.search);
 const checkpointId = searchParams.get("c") || "";
+const teamId = searchParams.get("team") || "";
 
 const teams = ref([]);
 const tasks = ref([]);
@@ -44,6 +45,11 @@ async function getTasks() {
 onMounted(() => {
     getTeams();
     getTasks();
+
+    if (teamId) {
+        teamModel.value = teamId;
+        confirmCheckpoint()
+    }
 });
 
 // dummy key to force re-render for v-if to work correctly
