@@ -10,8 +10,10 @@ const snackbarMsg = ref("");
 
 //display checkpoint id (from url params)
 const searchParams = new URLSearchParams(window.location.search);
-const checkpointId = searchParams.get("c") || "";
 const teamId = searchParams.get("team") || "";
+const id = searchParams.get("c")
+if (id) localStorage.setItem("checkpoint", id)
+const checkpointId = localStorage.getItem("checkpoint");
 
 const teams = ref([]);
 const tasks = ref([]);
