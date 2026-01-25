@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, defineProps } from "vue";
+import { ref, onMounted } from "vue";
 
 const searchParams = new URLSearchParams(window.location.search);
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -30,7 +30,11 @@ async function postCheckpointKey(key) {
         })
         .then((response) => response.json())
         .then((data) => {
-            msg.value = data;
+            if (status.value) {
+                msg.value = data;
+                localStorage.setItem("key", key);
+                localStorage.setItem("checkpoint", data.id);
+            }
         });
 }
 
