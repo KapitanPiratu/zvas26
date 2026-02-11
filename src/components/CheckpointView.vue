@@ -12,9 +12,8 @@ const snackbarMsg = ref("");
 const searchParams = new URLSearchParams(window.location.search);
 const teamId = searchParams.get("team") || "";
 const id = searchParams.get("c");
-if (id) localStorage.setItem("checkpoint", id);
-const checkpointId = localStorage.getItem("checkpoint");
-const checkpointKey = localStorage.getItem("key");
+const checkpointId = ref(undefined);
+const checkpointKey = ref(undefined);
 
 const teams = ref([]);
 const tasks = ref([]);
@@ -46,6 +45,10 @@ async function getTasks() {
 }
 
 onMounted(() => {
+    if (id) localStorage.setItem("checkpoint", id);
+    checkpointId.value = localStorage.getItem("checkpoint");
+    checkpointKey.value = localStorage.getItem("key");
+
     getTeams();
     getTasks();
 
