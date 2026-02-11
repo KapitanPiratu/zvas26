@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 
-const searchParams = new URLSearchParams(window.location.search);
+let searchParams; // Declare searchParams here, initialize in onMounted
 const apiUrl = import.meta.env.VITE_API_URL;
 const showLoading = ref(true);
 const msg = ref("");
@@ -39,7 +39,10 @@ async function postCheckpointKey(key) {
 }
 
 onMounted(() => {
-    postCheckpointKey(searchParams.get("key"));
+    if (typeof window !== "undefined") {
+        searchParams = new URLSearchParams(window.location.search);
+        postCheckpointKey(searchParams.get("key"));
+    }
 });
 </script>
 

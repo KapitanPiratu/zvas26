@@ -8,10 +8,6 @@ const showLoading = ref(false);
 const snackbar = ref(false);
 const snackbarMsg = ref("");
 
-//display checkpoint id (from url params)
-const searchParams = new URLSearchParams(window.location.search);
-const teamId = searchParams.get("team") || "";
-const id = searchParams.get("c");
 const checkpointId = ref(undefined);
 const checkpointKey = ref(undefined);
 
@@ -49,18 +45,21 @@ async function getTasks() {
 
 onMounted(() => {
     if (typeof window !== "undefined") {
+        const searchParams = new URLSearchParams(window.location.search);
+        const teamId = searchParams.get("team") || "";
+        const id = searchParams.get("c");
+
         if (id) localStorage.setItem("checkpoint", id);
         checkpointId.value = localStorage.getItem("checkpoint");
         checkpointKey.value = localStorage.getItem("key");
-    }
 
+        if (teamId) {
+            teamModel.value = teamId;
+            confirmCheckpoint();
+        }
+    }
     getTeams();
     getTasks();
-
-    if (teamId) {
-        teamModel.value = teamId;
-        confirmCheckpoint();
-    }
 });
 
 // dummy key to force re-render for v-if to work correctly
