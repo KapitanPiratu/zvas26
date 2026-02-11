@@ -10,7 +10,11 @@ const snackbarMsg = ref("");
 
 //display checkpoint id (from url params)
 const searchParams = new URLSearchParams(window.location.search);
-const checkpointId = searchParams.get("c") || "";
+const teamId = searchParams.get("team") || "";
+const id = searchParams.get("c");
+if (id) localStorage.setItem("checkpoint", id);
+const checkpointId = localStorage.getItem("checkpoint");
+const checkpointKey = localStorage.getItem("key");
 
 const teams = ref([]);
 const tasks = ref([]);
@@ -31,7 +35,7 @@ async function getTeams() {
 async function getTasks() {
     console.log("fetching");
     showLoading.value = true;
-    await fetch(apiUrl + `/tasks/?c=${checkpointId}`, {
+    await fetch(apiUrl + `/tasks/?c=${checkpointId}&key=${checkpointKey}`, {
         method: "GET",
     })
         .then((response) => response.json())
@@ -44,6 +48,11 @@ async function getTasks() {
 onMounted(() => {
     getTeams();
     getTasks();
+
+    if (teamId) {
+        teamModel.value = teamId;
+        confirmCheckpoint();
+    }
 });
 
 // dummy key to force re-render for v-if to work correctly
@@ -75,7 +84,7 @@ onBeforeUpdate(() => {
 async function postArrival() {
     showLoading.value = true;
 
-    await fetch(apiUrl + "/arrivallog", {
+    await fetch(apiUrl + `/arrivallog/?key=${checkpointKey}`, {
         method: "POST",
         body: JSON.stringify({
             team: teamModel.value,
@@ -104,7 +113,7 @@ async function postTasks() {
 
     showLoading.value = true;
 
-    await fetch(apiUrl + "/taskslog", {
+    await fetch(apiUrl + `/taskslog/?key=${checkpointKey}`, {
         method: "POST",
         body: JSON.stringify({
             team: teamModel.value,
