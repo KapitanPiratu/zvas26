@@ -34,9 +34,12 @@ async function getTeams() {
 async function getTasks() {
     console.log("fetching");
     showLoading.value = true;
-    await fetch(apiUrl + `/tasks/?c=${checkpointId}&key=${checkpointKey}`, {
-        method: "GET",
-    })
+    await fetch(
+        apiUrl + `/tasks/?c=${checkpointId.value}&key=${checkpointKey.value}`,
+        {
+            method: "GET",
+        },
+    )
         .then((response) => response.json())
         .then((data) => {
             tasks.value = data;
@@ -45,9 +48,11 @@ async function getTasks() {
 }
 
 onMounted(() => {
-    if (id) localStorage.setItem("checkpoint", id);
-    checkpointId.value = localStorage.getItem("checkpoint");
-    checkpointKey.value = localStorage.getItem("key");
+    if (typeof window !== "undefined") {
+        if (id) localStorage.setItem("checkpoint", id);
+        checkpointId.value = localStorage.getItem("checkpoint");
+        checkpointKey.value = localStorage.getItem("key");
+    }
 
     getTeams();
     getTasks();
@@ -87,11 +92,11 @@ onBeforeUpdate(() => {
 async function postArrival() {
     showLoading.value = true;
 
-    await fetch(apiUrl + `/arrivallog/?key=${checkpointKey}`, {
+    await fetch(apiUrl + `/arrivallog/?key=${checkpointKey.value}`, {
         method: "POST",
         body: JSON.stringify({
             team: teamModel.value,
-            checkpoint: checkpointId,
+            checkpoint: checkpointId.value,
             status: "arrived",
         }),
         headers: {
@@ -116,11 +121,11 @@ async function postTasks() {
 
     showLoading.value = true;
 
-    await fetch(apiUrl + `/taskslog/?key=${checkpointKey}`, {
+    await fetch(apiUrl + `/taskslog/?key=${checkpointKey.value}`, {
         method: "POST",
         body: JSON.stringify({
             team: teamModel.value,
-            checkpoint: checkpointId,
+            checkpoint: checkpointId.value,
             tasks: tasksResult.value,
         }),
         headers: {
