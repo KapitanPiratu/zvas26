@@ -51,6 +51,8 @@ async function getTasks() {
         });
 }
 
+let isCheckpoint = false;
+
 onMounted(() => {
     if (typeof window !== "undefined") {
         const searchParams = new URLSearchParams(window.location.search);
@@ -62,6 +64,7 @@ onMounted(() => {
         // checkpointKey = localStorage.getItem("key");
 
         if (teamId) {
+            isCheckpoint = true;
             teamModel.value = teamId;
             confirmCheckpoint();
         }
