@@ -8,11 +8,17 @@ const showLoading = ref(false);
 const snackbar = ref(false);
 const snackbarMsg = ref("");
 
-const checkpointId = ref(undefined);
-const checkpointKey = ref(undefined);
+const searchParams = new URLSearchParams(window.location.search);
+const teamId = searchParams.get("team") || "";
+const id = searchParams.get("c");
+if (id) localStorage.setItem("checkpoint", id);
+const checkpointId = localStorage.getItem("checkpoint");
+const checkpointKey = localStorage.getItem("key");
+const checkpointName = localStorage.getItem("checkpoint_name");
 
 const teams = ref([]);
 const tasks = ref([]);
+const teamName = ref("");
 
 async function getTeams() {
     console.log("fetching");
@@ -22,20 +28,22 @@ async function getTeams() {
     })
         .then((response) => response.json())
         .then((data) => {
-            teams.value = data.map((team) => team.id);
+            teams.value = data;
+            // teams.value = data.map((team) => team.id);
             showLoading.value = false;
+
+            if (teamId) {
+                teamName.value = data.find((el) => el.id == teamId).name;
+            }
         });
 }
 
 async function getTasks() {
     console.log("fetching");
     showLoading.value = true;
-    await fetch(
-        apiUrl + `/tasks/?c=${checkpointId.value}&key=${checkpointKey.value}`,
-        {
-            method: "GET",
-        },
-    )
+    await fetch(apiUrl + `/tasks/?c=${checkpointId}&key=${checkpointKey}`, {
+        method: "GET",
+    })
         .then((response) => response.json())
         .then((data) => {
             tasks.value = data;
@@ -49,9 +57,9 @@ onMounted(() => {
         const teamId = searchParams.get("team") || "";
         const id = searchParams.get("c");
 
-        if (id) localStorage.setItem("checkpoint", id);
-        checkpointId.value = localStorage.getItem("checkpoint");
-        checkpointKey.value = localStorage.getItem("key");
+        // if (id) localStorage.setItem("checkpoint", id);
+        // checkpointId = localStorage.getItem("checkpoint");
+        // checkpointKey = localStorage.getItem("key");
 
         if (teamId) {
             teamModel.value = teamId;
@@ -70,6 +78,14 @@ const showCard = ref(false);
 const teamModel = ref();
 function confirmCheckpoint() {
     if (teamModel.value) {
+        console.log("TEAMSSSSSSS");
+        console.log(teams.value);
+        teamName.value = teams.value.find((el) => el.id == teamModel.value);
+
+        if (typeof teamName.value === "object") {
+            teamName.value = teamName.value.name;
+        }
+
         showCard.value = true;
         postArrival();
     }
@@ -91,11 +107,11 @@ onBeforeUpdate(() => {
 async function postArrival() {
     showLoading.value = true;
 
-    await fetch(apiUrl + `/arrivallog/?key=${checkpointKey.value}`, {
+    await fetch(apiUrl + `/arrivallog/?key=${checkpointKey}`, {
         method: "POST",
         body: JSON.stringify({
             team: teamModel.value,
-            checkpoint: checkpointId.value,
+            checkpoint: checkpointId,
             status: "arrived",
         }),
         headers: {
@@ -120,11 +136,11 @@ async function postTasks() {
 
     showLoading.value = true;
 
-    await fetch(apiUrl + `/taskslog/?key=${checkpointKey.value}`, {
+    await fetch(apiUrl + `/taskslog/?key=${checkpointKey}`, {
         method: "POST",
         body: JSON.stringify({
             team: teamModel.value,
-            checkpoint: checkpointId.value,
+            checkpoint: checkpointId,
             tasks: tasksResult.value,
         }),
         headers: {
@@ -165,7 +181,7 @@ const readChildValues = () => {
 
 <template>
     <nav>
-        <h2>Checkpoint {{ checkpointId }}</h2>
+        <h2>Stanoviště {{ checkpointName }}</h2>
     </nav>
 
     <div v-if="!showCard">
@@ -174,20 +190,22 @@ const readChildValues = () => {
             v-model="teamModel"
             label="Choose team"
             :items="teams"
+            item-title="name"
+            item-value="id"
             class="select"
         ></v-select>
         <v-btn :key="key" @click="confirmCheckpoint" class="btn">Confirm</v-btn>
     </div>
 
     <v-card v-else class="card">
-        <h1>{{ teamModel }}</h1>
+        <h1>Tým {{ teamName }}</h1>
         <Task
             v-for="task in tasks"
             :key="task.id"
             :ref="setTaskRef"
             :task="task"
         />
-        <v-btn @click="readChildValues">CLICK</v-btn>
+        <v-btn @click="readChildValues">Odeslat</v-btn>
     </v-card>
 
     <div class="loading" v-if="showLoading">
