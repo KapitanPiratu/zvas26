@@ -34,6 +34,7 @@ async function postCheckpointKey(key) {
                 msg.value = data;
                 localStorage.setItem("key", key);
                 localStorage.setItem("checkpoint", data.id);
+                localStorage.setItem("checkpoint_name", data.name);
             }
         });
 }
@@ -120,8 +121,8 @@ nav h2 {
     margin: 1rem;
     margin-top: 6rem;
     font-weight: 590;
-    font-size: 1.5rem;
-    text-decoration: underline;
+    font-size: 1.1rem;
+    /* text-decoration: underline; */
 }
 
 .loading {

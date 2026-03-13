@@ -15,9 +15,11 @@ const id = searchParams.get("c");
 if (id) localStorage.setItem("checkpoint", id);
 const checkpointId = localStorage.getItem("checkpoint");
 const checkpointKey = localStorage.getItem("key");
+const checkpointName = localStorage.getItem("checkpoint_name");
 
 const teams = ref([]);
 const tasks = ref([]);
+const teamName = ref("");
 
 async function getTeams() {
     console.log("fetching");
@@ -27,8 +29,13 @@ async function getTeams() {
     })
         .then((response) => response.json())
         .then((data) => {
-            teams.value = data.map((team) => team.id);
+            teams.value = data;
+            // teams.value = data.map((team) => team.id);
             showLoading.value = false;
+
+            if (teamId) {
+                teamName.value = data.find((el) => el.id == teamId).name;
+            }
         });
 }
 
@@ -63,6 +70,9 @@ const showCard = ref(false);
 const teamModel = ref();
 function confirmCheckpoint() {
     if (teamModel.value) {
+        teamName.value = teams.value.find(
+            (el) => el.id == teamModel.value,
+        ).name;
         showCard.value = true;
         postArrival();
     }
@@ -158,7 +168,7 @@ const readChildValues = () => {
 
 <template>
     <nav>
-        <h2>Checkpoint {{ checkpointId }}</h2>
+        <h2>Stanoviště {{ checkpointName }}</h2>
     </nav>
 
     <div v-if="!showCard">
@@ -167,20 +177,22 @@ const readChildValues = () => {
             v-model="teamModel"
             label="Choose team"
             :items="teams"
+            item-title="name"
+            item-value="id"
             class="select"
         ></v-select>
         <v-btn :key="key" @click="confirmCheckpoint" class="btn">Confirm</v-btn>
     </div>
 
     <v-card v-else class="card">
-        <h1>{{ teamModel }}</h1>
+        <h1>Tým {{ teamName }}</h1>
         <Task
             v-for="task in tasks"
             :key="task.id"
             :ref="setTaskRef"
             :task="task"
         />
-        <v-btn @click="readChildValues">CLICK</v-btn>
+        <v-btn @click="readChildValues">Odeslat</v-btn>
     </v-card>
 
     <div class="loading" v-if="showLoading">
