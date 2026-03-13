@@ -8,7 +8,6 @@ const showLoading = ref(false);
 const snackbar = ref(false);
 const snackbarMsg = ref("");
 
-//display checkpoint id (from url params)
 const searchParams = new URLSearchParams(window.location.search);
 const teamId = searchParams.get("team") || "";
 const id = searchParams.get("c");
@@ -53,13 +52,22 @@ async function getTasks() {
 }
 
 onMounted(() => {
+    if (typeof window !== "undefined") {
+        const searchParams = new URLSearchParams(window.location.search);
+        const teamId = searchParams.get("team") || "";
+        const id = searchParams.get("c");
+
+        // if (id) localStorage.setItem("checkpoint", id);
+        // checkpointId = localStorage.getItem("checkpoint");
+        // checkpointKey = localStorage.getItem("key");
+
+        if (teamId) {
+            teamModel.value = teamId;
+            confirmCheckpoint();
+        }
+    }
     getTeams();
     getTasks();
-
-    if (teamId) {
-        teamModel.value = teamId;
-        confirmCheckpoint();
-    }
 });
 
 // dummy key to force re-render for v-if to work correctly
@@ -70,9 +78,14 @@ const showCard = ref(false);
 const teamModel = ref();
 function confirmCheckpoint() {
     if (teamModel.value) {
-        teamName.value = teams.value.find(
-            (el) => el.id == teamModel.value,
-        ).name;
+        console.log("TEAMSSSSSSS");
+        console.log(teams.value);
+        teamName.value = teams.value.find((el) => el.id == teamModel.value);
+
+        if (typeof teamName.value === "object") {
+            teamName.value = teamName.value.name;
+        }
+
         showCard.value = true;
         postArrival();
     }
