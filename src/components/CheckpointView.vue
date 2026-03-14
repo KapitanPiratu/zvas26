@@ -51,6 +51,8 @@ async function getTasks() {
         });
 }
 
+let isCheckpoint = false;
+
 onMounted(() => {
     if (typeof window !== "undefined") {
         const searchParams = new URLSearchParams(window.location.search);
@@ -62,6 +64,7 @@ onMounted(() => {
         // checkpointKey = localStorage.getItem("key");
 
         if (teamId) {
+            isCheckpoint = true;
             teamModel.value = teamId;
             confirmCheckpoint();
         }
@@ -78,16 +81,16 @@ const showCard = ref(false);
 const teamModel = ref();
 function confirmCheckpoint() {
     if (teamModel.value) {
-        console.log("TEAMSSSSSSS");
-        console.log(teams.value);
         teamName.value = teams.value.find((el) => el.id == teamModel.value);
 
         if (typeof teamName.value === "object") {
             teamName.value = teamName.value.name;
         }
 
-        showCard.value = true;
-        postArrival();
+        if (checkpointId) {
+            showCard.value = true;
+            postArrival();
+        }
     }
     key.value += 1;
 }
@@ -181,32 +184,44 @@ const readChildValues = () => {
 
 <template>
     <nav>
-        <h2>Stanoviště {{ checkpointName }}</h2>
+        <h2 v-if="checkpointId">Stanoviště {{ checkpointName }}</h2>
+        <h2 v-else>ZVaS 2026</h2>
     </nav>
 
-    <div v-if="!showCard">
-        <v-select
-            :key="key"
-            v-model="teamModel"
-            label="Choose team"
-            :items="teams"
-            item-title="name"
-            item-value="id"
-            class="select"
-        ></v-select>
-        <v-btn :key="key" @click="confirmCheckpoint" class="btn">Confirm</v-btn>
+    <div v-if="isCheckpoint">
+        <div v-if="!showCard">
+            <v-select
+                :key="key"
+                v-model="teamModel"
+                label="Choose team"
+                :items="teams"
+                item-title="name"
+                item-value="id"
+                class="select"
+            ></v-select>
+            <v-btn :key="key" @click="confirmCheckpoint" class="btn"
+                >Confirm</v-btn
+            >
+        </div>
+
+        <v-card v-else class="card">
+            <h1>Tým {{ teamName }}</h1>
+            <Task
+                v-for="task in tasks"
+                :key="task.id"
+                :ref="setTaskRef"
+                :task="task"
+            />
+            <v-btn @click="readChildValues">Odeslat</v-btn>
+        </v-card>
     </div>
 
-    <v-card v-else class="card">
-        <h1>Tým {{ teamName }}</h1>
-        <Task
-            v-for="task in tasks"
-            :key="task.id"
-            :ref="setTaskRef"
-            :task="task"
-        />
-        <v-btn @click="readChildValues">Odeslat</v-btn>
-    </v-card>
+    <div v-else>
+        <v-card class="card">
+            <!-- <h1>Tým {{ teamName }}</h1> -->
+            <h1>Nothing to see here...</h1>
+        </v-card>
+    </div>
 
     <div class="loading" v-if="showLoading">
         <v-progress-circular indeterminate></v-progress-circular>

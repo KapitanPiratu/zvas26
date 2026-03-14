@@ -62,7 +62,9 @@ onMounted(() => {
                             team.logs[0]
                                 ? team.logs[0].status +
                                   " " +
-                                  team.logs[0].created_at
+                                  new Date(
+                                      team.logs[0].created_at + "Z",
+                                  ).toLocaleTimeString()
                                 : "-"
                         }}
                     </span>
