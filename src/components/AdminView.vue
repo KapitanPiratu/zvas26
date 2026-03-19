@@ -1,4 +1,5 @@
 <script setup>
+import AdminTable from "./AdminTable.vue";
 import { onMounted, ref } from "vue";
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -36,42 +37,7 @@ onMounted(() => {
         <h2>Admin panel</h2>
     </nav>
 
-    <v-table>
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Team</th>
-                <th>Points</th>
-                <th>Last Checkpoint</th>
-                <th>Last Checkpoint Status</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            <tr v-for="team in teams">
-                <td>{{ team.id }}</td>
-                <td>{{ team.name }}</td>
-                <td>{{ team.points }}</td>
-                <td>{{ team.logs[0] ? team.logs[0].name : "-" }}</td>
-                <td>
-                    <span
-                        class="status"
-                        :class="team.logs[0] ? team.logs[0].status : ''"
-                    >
-                        {{
-                            team.logs[0]
-                                ? team.logs[0].status +
-                                  " " +
-                                  new Date(
-                                      team.logs[0].created_at + "Z",
-                                  ).toLocaleTimeString()
-                                : "-"
-                        }}
-                    </span>
-                </td>
-            </tr>
-        </tbody>
-    </v-table>
+    <AdminTable :teams="teams" />
 
     <div class="loading" v-if="showLoading">
         <v-progress-circular indeterminate></v-progress-circular>
@@ -100,10 +66,6 @@ nav h2 {
     margin-left: 2rem;
 }
 
-th {
-    font-weight: bold !important;
-}
-
 .loading {
     position: absolute;
     top: 0;
@@ -124,20 +86,5 @@ th {
     top: 5%;
     left: 50%;
     transform: translate(-50%, -50%);
-}
-
-.status {
-    padding: 0.6rem;
-    border-radius: 50px;
-}
-
-.departed {
-    background-color: #06a77d;
-    color: #03402f;
-}
-
-.arrived {
-    background-color: #367ac4;
-    color: #122c49;
 }
 </style>
