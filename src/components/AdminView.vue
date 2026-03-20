@@ -1,5 +1,6 @@
 <script setup>
 import AdminTable from "./AdminTable.vue";
+import AdminDialog from "./AdminDialog.vue";
 import { onMounted, ref } from "vue";
 
 const apiUrl = import.meta.env.VITE_API_URL;
@@ -23,6 +24,36 @@ async function getTeams() {
         });
 }
 
+// logic for sending teams
+const showDialog = ref(false);
+
+function toggleDialog() {
+    showDialog.value = !showDialog.value;
+}
+
+async function postTeam(data) {
+    showLoading.value = true;
+    const { name, organization, path } = data;
+
+    console.log("blabla", name, organization, path);
+
+    await fetch(apiUrl + `/newteam`, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    }).then((response) => {
+        showLoading.value = false;
+        if (response.status != 201) {
+            snackbarMsg.value = `Something went really wrong - TEAM WAS NOT CREATED - status code: ${response.status}`;
+            snackbar.value = true;
+        } else {
+            showDialog.value = false;
+        }
+    });
+}
+
 onMounted(() => {
     getTeams();
 
@@ -35,9 +66,15 @@ onMounted(() => {
 <template>
     <nav>
         <h2>Admin panel</h2>
+        <v-btn class="nav-btn" @click="toggleDialog">Send team</v-btn>
     </nav>
 
     <AdminTable :teams="teams" />
+    <AdminDialog
+        @close-dialog="showDialog = false"
+        @post-team="postTeam"
+        v-if="showDialog"
+    />
 
     <div class="loading" v-if="showLoading">
         <v-progress-circular indeterminate></v-progress-circular>
@@ -86,5 +123,12 @@ nav h2 {
     top: 5%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.nav-btn {
+    margin-right: 2rem;
+    position: absolute;
+    right: 0;
+    top: auto;
 }
 </style>
