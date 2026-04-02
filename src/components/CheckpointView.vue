@@ -5,8 +5,10 @@ import Task from "./Task.vue";
 const apiUrl = import.meta.env.VITE_API_URL;
 const showLoading = ref(false);
 
-const snackbar = ref(false);
-const snackbarMsg = ref("");
+const showError = ref(false);
+const errorMsg = ref("");
+
+const showSuccess = ref(false);
 
 const searchParams = new URLSearchParams(window.location.search);
 const teamId = searchParams.get("team") || "";
@@ -117,11 +119,11 @@ async function postArrival() {
         headers: {
             "Content-Type": "application/json",
         },
-    }).then((response) => {
+    }).then(async (response) => {
         showLoading.value = false;
         if (response.status != 200) {
-            snackbarMsg.value = `Something went really wrong - ARRIVAL WAS NOT LOGGED - status code: ${response.status}`;
-            snackbar.value = true;
+            showError.value = true;
+            errorMsg.value = await response.json();
         }
     });
 }
@@ -146,18 +148,16 @@ async function postTasks() {
         headers: {
             "Content-Type": "application/json",
         },
-    }).then((response) => {
+    }).then(async (response) => {
         showLoading.value = false;
         if (response.status != 201) {
-            snackbarMsg.value = `Something went really wrong - DATA WAS NOT LOGGED - status code: ${response.status}`;
-            snackbar.value = true;
+            showError.value = true;
+            errorMsg.value = await response.json();
         } else {
             showCard.value = false;
             teamModel.value = undefined;
 
-            snackbarMsg.value = "Data succesfully submited";
-            snackbar.value = true;
-            setTimeout(() => (snackbar.value = false), 5000);
+            showSuccess.value = true;
         }
     });
 }
@@ -224,12 +224,17 @@ const readChildValues = () => {
         <v-progress-circular indeterminate></v-progress-circular>
     </div>
 
-    <v-snackbar class="snackbar" v-model="snackbar">
-        {{ snackbarMsg }}
-        <template v-slot:actions>
-            <v-btn @click="snackbar = false">close</v-btn>
-        </template>
-    </v-snackbar>
+    <div class="success" v-if="showSuccess">
+        <h1>Vše je v pořádku</h1>
+
+        <p>Nyní můžeš zavřít toto okno.</p>
+    </div>
+
+    <div class="error" v-if="showError">
+        <h1>Něco se pokazilo!</h1>
+
+        <p>{{ errorMsg.error }}</p>
+    </div>
 </template>
 
 <style scoped>
@@ -278,10 +283,45 @@ nav h2 {
     opacity: 0.8;
 }
 
-.snackbar {
-    position: absolute;
-    top: 5%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.error {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(255, 0, 0, 0.85);
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    color: rgb(58, 0, 0);
+}
+
+.error * {
+    transform: translateY(-10vh);
+}
+
+.success {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgb(6, 167, 125, 0.85);
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    color: #03402f;
+}
+
+.success * {
+    transform: translateY(-10vh);
 }
 </style>
