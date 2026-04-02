@@ -296,6 +296,7 @@ nav h2 {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
 
     color: rgb(58, 0, 0);
 }
@@ -317,6 +318,7 @@ nav h2 {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
 
     color: #03402f;
 }
