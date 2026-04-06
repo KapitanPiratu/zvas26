@@ -1,5 +1,15 @@
 <script setup>
 const { teams } = defineProps(["teams"]);
+
+const statusClass = (team) => {
+    if (team.path == "") {
+        return "finished";
+    } else if (team.logs[0]) {
+        return team.logs[0].status;
+    } else {
+        return "";
+    }
+};
 </script>
 
 <template>
@@ -21,10 +31,7 @@ const { teams } = defineProps(["teams"]);
                 <td>{{ team.points }}</td>
                 <td>{{ team.logs[0] ? team.logs[0].name : "-" }}</td>
                 <td>
-                    <span
-                        class="status"
-                        :class="team.logs[0] ? team.logs[0].status : ''"
-                    >
+                    <span class="status" :class="statusClass(team)">
                         {{
                             team.logs[0]
                                 ? team.logs[0].status +
@@ -59,5 +66,10 @@ th {
 .arrived {
     background-color: #367ac4;
     color: #122c49;
+}
+
+.finished {
+    background-color: #cccccc;
+    color: #000;
 }
 </style>
