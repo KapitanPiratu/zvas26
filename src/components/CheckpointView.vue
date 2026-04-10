@@ -186,22 +186,7 @@ const readChildValues = () => {
     </nav>
 
     <div v-if="checkpointId">
-        <div v-if="!showCard">
-            <v-select
-                :key="key"
-                v-model="teamModel"
-                label="Choose team"
-                :items="teams"
-                item-title="name"
-                item-value="id"
-                class="select"
-            ></v-select>
-            <v-btn :key="key" @click="confirmCheckpoint" class="btn"
-                >Confirm</v-btn
-            >
-        </div>
-
-        <v-card v-else class="card">
+        <v-card v-if="showCard" class="card">
             <h1>Tým {{ teamName }}</h1>
             <Task
                 v-for="task in tasks"
@@ -303,6 +288,7 @@ nav h2 {
 
 .error * {
     transform: translateY(-10vh);
+    padding: 1rem;
 }
 
 .success {
